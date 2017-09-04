@@ -5,51 +5,15 @@ void	destroy(t_fr *f)
 	mlx_destroy_image(f->mlx.mlx, f->mlx.img);
 	mlx_clear_window(f->mlx.mlx, f->mlx.win);
 	mlx_destroy_window(f->mlx.mlx, f->mlx.win);
-	//freeall(f, -1);
 	exit(0);
 }
 
-
-int		key_fun(int key, void *tmp)
+void	redraw(t_fr *f)
 {
-	t_fr *f;
-
-	f = (t_fr *)tmp;
-	if (key == 53)
-		destroy(f);
-/*
-	if (key == 91)
-		rot_x(f->pix, 1);
-	if (key == 84)
-		rot_x(f->pix, -1);
-	if (key == 86)
-		rot_y(f->pix, 1);
-	if (key == 88)
-		rot_y(fdf->pix, -1);
-	if (key == 89)
-		rot_z(fdf->pix, 1);
-	if (key == 92)
-		rot_z(fdf->pix, -1);
-	if (key == 69)
-		zoom(fdf->pix, 1.2);
-	if (key == 78)
-		zoom(fdf->pix, 0.8);
-	if (key == 67)
-		change_color(fdf, -1);
-	redraw(fdf);
-*/
-	return (0);
-}
-
-t_mlx	create_mlx(t_fr *f)
-{
-	t_mlx	mlx;
-
-	mlx.mlx = mlx_init();
-	mlx.win = mlx_new_window(mlx.mlx, MAX_W, MAX_H, f->name);
-	mlx.img = mlx_new_image(mlx.mlx, MAX_W, MAX_H);
-	mlx.str = mlx_get_data_addr(mlx.img, &mlx.bpp, &mlx.size_l, &mlx.e);
-	return (mlx);
+	mlx_destroy_image(f->mlx.mlx, f->mlx.img);
+	f->mlx.img = mlx_new_image(f->mlx.mlx, MAX_W, MAX_H);
+	f->mlx.str = mlx_get_data_addr(f->mlx.img, &f->mlx.bpp, &f->mlx.size_l, &f->mlx.e);
+	speed(f, 0, -1);
 }
 
 t_color	init_color(void)
@@ -70,110 +34,317 @@ t_color	init_color(void)
 	return (rgb);
 }
 
-void	draw_pix(t_fr *f, int pix, int w, int c)
+int		key_hook(int key, void *tmp)
 {
-	f->mlx.str[pix + 0] = (unsigned char)(sin(f->rgb.red_frequency * f->rgb.index + f->rgb.red_phase) * w + c);
-	f->mlx.str[pix + 1] = (unsigned char)(sin(f->rgb.grn_frequency * f->rgb.index + f->rgb.grn_phase) * w + c);
-	f->mlx.str[pix + 2] = (unsigned char)(sin(f->rgb.blu_frequency * f->rgb.index + f->rgb.blu_phase) * w + c);
-	f->mlx.str[pix + 3] = 0;
+	t_fr *f;
+
+	f = (t_fr *)tmp;
+	if (key == 53)
+		destroy(f);
+	printf("|%d|\n", key);
+	if (key == 18)
+		f->rgb.red_frequency += 0.001;
+	else if (key == 12)
+		f->rgb.red_frequency -= 0.001;
+	else if (key == 19)
+		f->rgb.grn_frequency += 0.001;
+	else if (key == 13)
+		f->rgb.grn_frequency -= 0.001;
+	else if (key == 20)
+		f->rgb.blu_frequency += 0.001;
+	else if (key == 14)
+		f->rgb.blu_frequency -= 0.001;
+	else if (key == 21)
+		f->rgb.red_phase += 1;
+	else if (key == 15)
+		f->rgb.red_phase -= 1;
+	else if (key == 23)
+		f->rgb.grn_phase += 1;
+	else if (key == 17)
+		f->rgb.grn_phase -= 1;
+	else if (key == 22)
+		f->rgb.blu_phase += 1;
+	else if (key == 16)
+		f->rgb.blu_phase -= 1;
+	else if (key == 26)
+		f->rgb.width1 += 1;
+	else if (key == 32)
+		f->rgb.width1 -= 1;
+	else if (key == 28)
+		f->rgb.width2 += 1;
+	else if (key == 34)
+		f->rgb.width2 -= 1;
+	else if (key == 25)
+		f->rgb.center1 += 1;
+	else if (key == 31)
+		f->rgb.center1 -= 1;
+	else if (key == 29)
+		f->rgb.center2 += 1;
+	else if (key == 35)
+		f->rgb.center2 -= 1;
+	else if (key == 49)
+		f->rgb = init_color();//return to fisrst arg
+	else if (key == 126)
+		f->data.x_move -= 0.1;
+	else if (key == 124)
+		f->data.y_move += 0.1;
+	else if (key == 125)
+		f->data.x_move += 0.1;
+	else if (key == 123)
+		f->data.y_move -= 0.1;
+	else if (key == 78)
+	{
+		f->data.zoom += 0.02;
+		f->data.i_max += 1;
+	}
+	else if (key == 69)
+	{
+		f->data.zoom -= 0.02;
+		f->data.i_max += 1;
+	}
+
+
+
+
+
+	redraw(f);
+	return (0);
 }
 
-void	draw_color(t_fr *f, int pix, int i)
+t_mlx	create_mlx(t_fr *f)
 {
-	f->rgb.index = i + 1 - (log(2) / sqrt(f->zx2 + f->zy2)) / log (2);
-	if (i == f->i_max)
-		draw_pix(f, pix, f->rgb.width1, f->rgb.center1);
+	t_mlx	mlx;
+
+	mlx.mlx = mlx_init();
+	mlx.win = mlx_new_window(mlx.mlx, MAX_W, MAX_H, f->name);
+	mlx.img = mlx_new_image(mlx.mlx, MAX_W, MAX_H);
+	mlx.str = mlx_get_data_addr(mlx.img, &mlx.bpp, &mlx.size_l, &mlx.e);
+	return (mlx);
+}
+
+void	draw_color(t_fr *f, t_data *d, int pix, int i)
+{
+	d->rgb.index = i + 1 - (log(2) / sqrt(d->zx2 + d->zy2)) / log (2);
+	if (i == d->i_max)
+	{
+		f->mlx.str[pix + 0] = (unsigned char)(sin(f->rgb.red_frequency
+			* d->rgb.index + f->rgb.red_phase) * f->rgb.width1 + f->rgb.center1);
+		f->mlx.str[pix + 1] = (unsigned char)(sin(f->rgb.grn_frequency
+			* d->rgb.index + f->rgb.grn_phase) * f->rgb.width1 + f->rgb.center1);
+		f->mlx.str[pix + 2] = (unsigned char)(sin(f->rgb.blu_frequency
+			* d->rgb.index + f->rgb.blu_phase) * f->rgb.width1 + f->rgb.center1);
+		f->mlx.str[pix + 3] = 0;
+	}
 	else
-		draw_pix(f, pix, f->rgb.width2, f->rgb.center2);
+	{
+		f->mlx.str[pix + 0] = (unsigned char)(sin(f->rgb.red_frequency
+			* d->rgb.index + f->rgb.red_phase) * f->rgb.width2 + f->rgb.center2);
+		f->mlx.str[pix + 1] = (unsigned char)(sin(f->rgb.grn_frequency
+			* d->rgb.index + f->rgb.grn_phase) * f->rgb.width2 + f->rgb.center2);
+		f->mlx.str[pix + 2] = (unsigned char)(sin(f->rgb.blu_frequency
+			* d->rgb.index + f->rgb.blu_phase) * f->rgb.width2 + f->rgb.center2);
+		f->mlx.str[pix + 3] = 0;
+	}
 }
 
-void	mandelbrot(t_fr *f, int iy, int ix, int i)
+
+void	mandelbrot(t_fr *f, t_data *d, int iy, int ix)
 {
-	if (f->k != iy && (f->k = iy) >= 0)
+	int i;
+
+	if (d->k != iy && (d->k = iy) >= 0)
 	{
-		f->cy = f->y_min + iy * f->pix_h;
-		if (fabs(f->cy) < f->pix_h / 2)
-			f->cy = 0.0;
+		d->cy = d->y_min + iy * d->pix_h;
+		if (fabs(d->cy) < d->pix_h / 2)
+			d->cy = 0.0;
 	}
-	f->cx = f->x_min + ix * f->pix_w;
-	f->zx = 0.0;
-	f->zy = 0.0;
-	f->zx2 = f->zx * f->zx;
-	f->zy2 = f->zy * f->zy;
-	while (++i < f->i_max && ((f->zx2 + f->zy2) < f->er2))
+	d->cx = d->x_min + ix * d->pix_w;
+	d->zx = 0.0;
+	d->zy = 0.0;
+	d->zx2 = d->zx * d->zx;
+	d->zy2 = d->zy * d->zy;
+	i = -1;
+	while (++i < d->i_max && ((d->zx2 + d->zy2) < d->er2))
 	{
-		f->zy = 2 * f->zx * f->zy + f->cy;
-		f->zx = f->zx2 - f->zy2 + f->cx;
-		f->zx2 = f->zx * f->zx;
-		f->zy2 = f->zy * f->zy;
+		d->zy = (2 * d->zx * d->zy + d->cy * d->zoom) + d->x_move;
+		d->zx = (d->zx2 - d->zy2 + d->cx* d->zoom) + d->y_move;
+		d->zx2 = d->zx * d->zx;
+		d->zy2 = d->zy * d->zy;
 	}
-	draw_color(f, iy * f->mlx.size_l + ix * 4, i);
+	draw_color(f, d, iy * f->mlx.size_l + ix * 4, i);
 }
 
-void	julia(t_fr *f, int iy, int ix, int i)
+void	julia(t_fr *f, t_data *d, int iy, int ix)
 {
-	f->cx = -0.7;
-	f->cy = 0.27015;
+	int i;
 
-	f->zoom = 1;
-	f->x_move = 0;
-	f->y_move = 0;
-	f->zx = 1.5 * (ix - MAX_W / 2) / (0.5 * f->zoom * MAX_W) + f->x_move;
-	f->zy = (iy - MAX_H / 2) / (0.5 * f->zoom * MAX_H) + f->y_move;
-	f->zx2 = f->zx * f->zx;
-	f->zy2 = f->zy * f->zy;
-	i = f->i_max;
-	while (f->zx2 + f->zy2 < f->er2 && i--)
+	d->zx = 1.5 * (ix - MAX_W / 2) / (0.5 * MAX_W) * d->zoom + d->x_move;
+	d->zy = (iy - MAX_H / 2) / (0.5 * MAX_H) * d->zoom + d->y_move;
+	d->zx2 = d->zx * d->zx;
+	d->zy2 = d->zy * d->zy;
+	i = d->i_max;
+	while (d->zx2 + d->zy2 < d->er2 && i--)
 	{
-		f->zx2 = f->zx * f->zx;
-		f->zy2 = f->zy * f->zy;
-		f->zy = 2 * f->zx * f->zy + f->cy;
-		f->zx = f->zx2 - f->zy2 + f->cx;
+		d->zx2 = d->zx * d->zx;
+		d->zy2 = d->zy * d->zy;
+		d->zy = 2 * d->zx * d->zy + d->cy;
+		d->zx = d->zx2 - d->zy2 + d->cx;
 	}
-	f->zx2 = f->zx * f->zx;
-	f->zy2 = f->zy * f->zy;
-	draw_color(f, iy * f->mlx.size_l + ix * 4, i);
+	d->zx2 = d->zx * d->zx;
+	d->zy2 = d->zy * d->zy;
+	draw_color(f, d, iy * f->mlx.size_l + ix * 4, i);
 }
 
-void	fractol(t_fr *f, int iy, int ix)
+int		mouse_hook(int button, int x, int y, void *tmp)
 {
-	f->k = -1;
-	while (++iy < MAX_W)
+	t_fr *f;
+
+	f = (t_fr *)tmp;
+	if (button == 4)
+	{
+		f->data.zoom += 0.02;
+		f->data.i_max += 1;
+	}
+	else if (button == 5)
+	{
+		f->data.zoom -= 0.02;
+		f->data.i_max -= 1;
+	}
+	redraw(f);
+	return (0);
+}
+
+
+int		mouse_exit(void *par)
+{
+	par = NULL;
+	exit(1);
+}
+
+int		mouse_move(int x, int y, void *tmp)
+{
+	t_fr *f;
+
+	f = (t_fr *)tmp;
+	if (x < 0 || y < 0 || x > MAX_W || y > MAX_H)
+		return (0);
+	f->data.cx = ((double)x - MAX_W) / MAX_W;
+	f->data.cy = ((double)y - MAX_H) / MAX_H;
+	redraw(f);
+	return (0);
+}
+
+void	*fractol(void *arg)
+{
+	int		iy;
+	int		ix;
+	t_data	*d;
+
+	d = (t_data *)arg;
+	d->k = -1;
+	iy = d->iy;
+	while (++iy < d->max_w)
 	{
 		ix = -1;
 		while (++ix < MAX_H)
 		{
-			//mandelbrot(f, iy, ix, -1);
-			julia(f, iy, ix, -1);
+			mandelbrot(d->f, d, iy, ix);
+			//julia(d->f, d, iy, ix);
 		}
 	}
+	return (arg);
+}
+
+t_data	init_data(void)
+{
+	t_data	data;
+
+	data.x_min = -2.5;
+	data.x_max = 1.5;
+	data.y_min = -2.0;
+	data.y_max = 2.0;
+	data.pix_w = (data.x_max - data.x_min) / MAX_H;
+	data.pix_h = (data.y_max - data.y_min) / MAX_W;
+	data.zx = 0.0;
+	data.zy = 0.0;
+	data.zx2 = 0.0;
+	data.zy2 = 0.0;
+	data.i_max = MAX_I;
+	data.er = 2;
+	data.er2 = data.er * data.er;
+	data.zoom = 1;
+	data.x_move = 0;
+	data.y_move = 0;
+	data.rgb = init_color();
+	return (data);
+}
+
+t_data	copy_data(t_fr *f, int iy, int max_w)
+{
+	t_data data;
+
+	data.x_min = f->data.x_min;
+	data.x_max = f->data.x_max;
+	data.y_min = f->data.y_min;
+	data.y_max = f->data.y_max;
+	data.pix_w = f->data.pix_w;
+	data.pix_h = f->data.pix_h;
+	data.zx = f->data.zx;
+	data.zy = f->data.zy;
+	data.zx2 = f->data.zx2;
+	data.zy2 = f->data.zy2;
+	data.cx = f->data.cx;
+	data.cy = f->data.cy;
+	data.i_max = f->data.i_max;
+	data.er = f->data.er;
+	data.er2 = f->data.er2;
+	data.iy = iy;
+	data.max_w = max_w;
+	data.zoom = f->data.zoom;
+	data.x_move = f->data.x_move;
+	data.y_move = f->data.y_move;
+	data.rgb = f->rgb;
+	data.f = f;
+	return (data);
+}
+
+
+void	speed(t_fr *f, int t, int i)
+{
+	pthread_t	p[MAX_THREADS];
+	t_data		tmp[MAX_THREADS];
+
+	t = MAX_H / MAX_THREADS;
+	while (++i < MAX_THREADS)
+	{
+		tmp[i] = copy_data(f, i * t - 1, i * t + t);
+		pthread_create(&p[i], NULL, fractol, &tmp[i]);
+	}
+	i = -1;
+	while (++i < MAX_THREADS)
+		pthread_join(p[i], NULL);
 	mlx_put_image_to_window(f->mlx.mlx, f->mlx.win, f->mlx.img, 0, 0);
-	mlx_hook(f->mlx.win, 2, 5, &key_fun, f);
+	mlx_hook(f->mlx.win, 2, 5, &key_hook, f);
+	mlx_mouse_hook(f->mlx.win, &mouse_hook, f);
+	mlx_hook(f->mlx.win, 6, (1L << 6), mouse_move, f);
+	mlx_hook(f->mlx.win, 17, (1L << 17), mouse_exit, f);
 	mlx_loop(f->mlx.mlx);
 }
 
 void	init(t_fr *f, char *name)
 {
-	f->x_min = -2.5;
-	f->x_max = 1.5;
-	f->y_min = -2.0;
-	f->y_max = 2.0;
-	f->pix_w = (f->x_max - f->x_min) / MAX_H;
-	f->pix_h = (f->y_max - f->y_min) / MAX_W;
-	f->zx = 0.0;
-	f->zy = 0.0;
-	f->zx2 = f->zx * f->zx;
-	f->zy2 = f->zy * f->zy;
-	f->i_max = MAX_I;
-	f->er = 2;
-	f->er2 = f->er * f->er;
 	f->name = name;
 	f->rgb = init_color();
-
-
+	f->data = init_data();
 	f->mlx = create_mlx(f);
 
-	fractol(f, -1, -1);
+// julia
+	f->data.cx = -0.7;
+	f->data.cy = 0.27015;
+
+	
+	speed(f, 0, -1);
+
 }
 
 int		main(int c, char **v)
@@ -185,14 +356,8 @@ int		main(int c, char **v)
 	if (c > 1)
 	{
 		init(&f[i], v[i]);
-		ft_putstr(v[i]);
-		ft_putstr("\n");
-
-
-			
-
-
-
+		// ft_putstr(v[i]);
+		// ft_putstr("\n");
 	}
 	else if (c > 4)
 		ft_putstr("Many arguments, use max only 3\n");
