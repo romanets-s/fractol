@@ -3,7 +3,7 @@ SRC = main.c
 SRCO = $(SRC:.c=.o)
 INCLUDES = fractol.h
 #FLAGS = -Wall -Wextra -Werror
-LIBFLAGS = -lmlx -framework OpenGL -framework AppKit
+LIBFLAGS = -lmlx -framework OpenGL -framework AppKit -g
 LIBFT = libft/libft.a
 
 all: $(NAME)
