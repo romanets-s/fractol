@@ -33,6 +33,7 @@ void	change_fractal(t_fr *f, int key)
 		f->fractal = 't';
 	f->data = init_data();
 	f->tree = init_data_tree();
+	f->rgb = init_color();
 	redraw(f);
 }
 
