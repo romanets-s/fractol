@@ -31,8 +31,8 @@ void	change_fractal(t_fr *f, int key)
 		f->fractal = 'j';
 	else if (key == 85)
 		f->fractal = 't';
-	f->data = init_data(f);
-	f->tree = init_data_tree(f);
+	f->data = init_data();
+	f->tree = init_data_tree();
 	redraw(f);
 }
 
@@ -49,17 +49,18 @@ char	*fractal_name(char c)
 
 void	init(t_fr *f, char *name)
 {
-	if (name[0] != 't' && name[0] != 'j' && name[0] != 'm')
+	if (!ft_strequ("t", name) && !ft_strequ("m", name) && !ft_strequ("j", name))
 	{
-		ft_putstr("Wrong fractal shortcut\n");
+		ft_putstr(name);
+		ft_putstr(" - Wrong fractal shortcut\n");
 		return ;
 	}
 	f->fractal = name[0];
 	f->name = fractal_name(f->fractal);
 	f->rgb = init_color();
-	f->data = init_data(f);
+	f->data = init_data();
 	f->mlx = create_mlx(f);
-	f->tree = init_data_tree(f);
+	f->tree = init_data_tree();
 	if (f->fractal == 'm' || f->fractal == 'j')
 		speed(f, 0, -1);
 	else if (f->fractal == 't')
@@ -70,18 +71,25 @@ int		main(int c, char **v)
 {
 	int		i;
 	t_fr	f[c - 1];
+	pid_t	id;
 
 	if (c > 1 && c < 5)
 	{
 		i = 0;
 		while (i + 1 < c)
 		{
-			init(&f[i], v[i + 1]);
-			i++;
+			id = fork();
+			if (id == 0)
+				i += 1;
+			else
+			{
+				init(&f[i], v[i + 1]);
+				break ;
+			}
 		}
 	}
 	else if (c > 4)
-		ft_putstr("Many arguments, use max only 3\n");
+		ft_putstr("Many arguments, use max 3\n");
 	else
 		ft_putstr("Usage: m or j or t or several together\n");
 	return (0);

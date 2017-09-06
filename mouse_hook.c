@@ -16,6 +16,7 @@ int		mouse_hook(int button, int x, int y, void *tmp)
 {
 	t_fr *f;
 
+	x = y;
 	f = (t_fr *)tmp;
 	if (f->fractal == 't')
 		return (0);

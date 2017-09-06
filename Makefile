@@ -2,7 +2,7 @@ NAME = fractol
 SRC = main.c init.c key_hook.c mouse_hook.c tree_fun.c fractals.c draw.c
 SRCO = $(SRC:.c=.o)
 INCLUDES = fractol.h
-#FLAGS = -Wall -Wextra -Werror
+FLAGS = -Wall -Wextra -Werror
 LIBFLAGS = -lmlx -framework OpenGL -framework AppKit -g
 LIBFT = libft/libft.a
 

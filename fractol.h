@@ -104,8 +104,8 @@ typedef struct	s_fr
 }				t_fr;
 
 t_color			init_color(void);
-t_tree			init_data_tree(t_fr	*f);
-t_data			init_data(t_fr *f);
+t_tree			init_data_tree(void);
+t_data			init_data(void);
 t_data			copy_data(t_fr *f, int iy, int max_w);
 int				key_hook_tree(int key, void *tmp);
 int				key_hook(int key, void *tmp);

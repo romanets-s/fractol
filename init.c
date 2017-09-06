@@ -30,12 +30,10 @@ t_color	init_color(void)
 	return (rgb);
 }
 
-t_tree	init_data_tree(t_fr *f)
+t_tree	init_data_tree(void)
 {
 	t_tree	t;
 
-	if (f->fractal != 't')
-		return (t);
 	t.angle = -90;
 	t.depth = 10;
 	t.r = 10.0;
@@ -54,12 +52,10 @@ t_tree	init_data_tree(t_fr *f)
 	return (t);
 }
 
-t_data	init_data(t_fr *f)
+t_data	init_data(void)
 {
 	t_data	data;
 
-	if (f->fractal != 'j' && f->fractal != 'm')
-		return (data);
 	data.x_min = -2.5;
 	data.x_max = 1.5;
 	data.y_min = -2.0;
