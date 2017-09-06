@@ -1,5 +1,5 @@
 NAME = fractol
-SRC = main.c
+SRC = main.c init.c key_hook.c mouse_hook.c tree_fun.c fractals.c draw.c
 SRCO = $(SRC:.c=.o)
 INCLUDES = fractol.h
 #FLAGS = -Wall -Wextra -Werror
